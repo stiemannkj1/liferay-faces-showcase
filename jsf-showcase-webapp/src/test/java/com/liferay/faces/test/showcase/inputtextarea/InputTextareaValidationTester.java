@@ -17,10 +17,6 @@ package com.liferay.faces.test.showcase.inputtextarea;
 
 import org.junit.Test;
 
-import org.openqa.selenium.WebElement;
-
-import com.liferay.faces.test.selenium.Browser;
-
 
 /**
  * @author  Kyle Stiemann
@@ -30,43 +26,6 @@ public class InputTextareaValidationTester extends InputTextareaTester {
 
 	@Test
 	public void runInputTextareaValidationTest() throws Exception {
-
-		Browser browser = Browser.getInstance();
-		browser.navigateToURL(inputTextURL + "/validation");
-
-		// Wait to begin the test until the submit button is rendered.
-		browser.waitForElementVisible(submitButtonXpath);
-
-		// Test that the web page shows an error message when an invalid value is submitted.
-		WebElement input = browser.getElement(inputXpath);
-		input.clear();
-
-		String invalidText = "HelloWorldcom";
-		input.sendKeys(invalidText);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpath);
-		browser.assertElementVisible(errorXpath);
-
-		// Test that a valid value submits successfully.
-		input = browser.getElement(inputXpath);
-		input.clear();
-
-		String text = "Hello@World.com";
-		input.sendKeys(text);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpath);
-		browser.assertElementTextVisible(modelValueXpath, text);
-
-		// Test that the web page shows an error message when an invalid value is submitted.
-		input = browser.getElement(inputXpathRight);
-		input.clear();
-		input.sendKeys(invalidText);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpathRight);
-		browser.assertElementVisible(errorXpath);
-
-		// Test that a valid value submits successfully.
-		input = browser.getElement(inputXpathRight);
-		input.clear();
-		input.sendKeys(text);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpathRight);
-		browser.assertElementTextVisible(modelValueXpathRight, text);
+		runInputTextValidationTest(inputTextareaURL, textarea1Xpath, textarea2Xpath);
 	}
 }

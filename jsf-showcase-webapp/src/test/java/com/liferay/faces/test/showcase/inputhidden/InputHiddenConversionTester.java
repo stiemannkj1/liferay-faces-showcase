@@ -18,6 +18,7 @@ package com.liferay.faces.test.showcase.inputhidden;
 import org.junit.Test;
 
 import com.liferay.faces.test.selenium.Browser;
+import com.liferay.faces.test.selenium.assertion.SeleniumAssert;
 
 
 /**
@@ -30,31 +31,29 @@ public class InputHiddenConversionTester extends InputHiddenTester {
 	public void runInputHiddenConversionTest() throws Exception {
 
 		Browser browser = Browser.getInstance();
-		browser.navigateToURL(inputHiddenURL + "/conversion");
+		browser.get(inputHiddenURL + "/conversion");
 
 		// Wait to begin the test until the submit button is rendered.
-		browser.waitForElementVisible(submitButtonXpath);
+		browser.waitForElementVisible(submitButton1Xpath);
 
 		// Test that a hidden valid value submits successfully.
-		String text = "Apr 5, 0033";
-		browser.click(copyValidValueButtonXpath);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpath);
-		browser.assertElementTextVisible(modelValueXpath, text);
+		browser.click(copyValidValueButton1Xpath);
+		browser.clickAndWaitForAjaxRerender(submitButton1Xpath);
+		SeleniumAssert.assertElementTextVisible(browser, modelValue1Xpath, "Apr 5, 0033");
 
 		// Test that the hidden value clears successfully.
-		browser.click(clearButtonXpath);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpath);
-		browser.assertElementPresent(modelValueEmptyXpath);
+		browser.click(clearButton1Xpath);
+		browser.clickAndWaitForAjaxRerender(submitButton1Xpath);
+		SeleniumAssert.assertElementPresent(browser, modelValueEmpty1Xpath);
 
 		// Test that a hidden valid value submits successfully.
-		text = "04/05/0033";
-		browser.click(copyValidValueButtonXpathRight);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpathRight);
-		browser.assertElementTextVisible(modelValueXpathRight, text);
+		browser.click(copyValidValueButton2Xpath);
+		browser.clickAndWaitForAjaxRerender(submitButton2Xpath);
+		SeleniumAssert.assertElementTextVisible(browser, modelValue2Xpath, "04/05/0033");
 
 		// Test that the hidden value clears successfully.
-		browser.click(clearButtonXpathRight);
-		browser.clickAndWaitForAjaxRerender(submitButtonXpathRight);
-		browser.assertElementPresent(modelValueEmptyXpathRight);
+		browser.click(clearButton2Xpath);
+		browser.clickAndWaitForAjaxRerender(submitButton2Xpath);
+		SeleniumAssert.assertElementPresent(browser, modelValueEmpty2Xpath);
 	}
 }

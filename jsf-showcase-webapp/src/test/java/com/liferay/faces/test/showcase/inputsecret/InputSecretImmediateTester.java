@@ -17,9 +17,8 @@ package com.liferay.faces.test.showcase.inputsecret;
 
 import org.junit.Test;
 
-import org.openqa.selenium.WebElement;
-
 import com.liferay.faces.test.selenium.Browser;
+import com.liferay.faces.test.selenium.assertion.SeleniumAssert;
 
 
 /**
@@ -32,26 +31,24 @@ public class InputSecretImmediateTester extends InputSecretTester {
 	public void runInputSecretImmediateTest() throws Exception {
 
 		Browser browser = Browser.getInstance();
-		browser.navigateToURL(inputSecretURL + "/immediate");
+		browser.get(inputSecretURL + "/immediate");
 
 		// Wait to begin the test until the submit button is rendered.
-		browser.waitForElementVisible(submitButtonXpath);
+		browser.waitForElementVisible(submitButton1Xpath);
 
 		// Test that the value submits successfully and the valueChangeListener method is called during the
 		// APPLY_REQUEST_VALUES phase.
-		WebElement input = browser.getElement(inputXpath);
 		String text = "Hello World!";
-		input.sendKeys(text);
-		browser.performAndWaitForAjaxRerender(browser.createClickAction(submitButtonXpath), modelValueXpath);
-		browser.assertElementTextVisible(modelValueXpath, text);
-		browser.assertElementVisible(immediateMessage);
+		browser.sendKeys(input1Xpath, text);
+		browser.performAndWaitForAjaxRerender(browser.createClickAction(submitButton1Xpath), modelValue1Xpath);
+		SeleniumAssert.assertElementTextVisible(browser, modelValue1Xpath, text);
+		SeleniumAssert.assertElementVisible(browser, immediateMessage1Xpath);
 
 		// Test that the value submits successfully and the valueChangeListener method is called during the
 		// PROCESS_VALIDATIONS phase.
-		input = browser.getElement(inputXpathRight);
-		input.sendKeys(text);
-		browser.performAndWaitForAjaxRerender(browser.createClickAction(submitButtonXpathRight), modelValueXpathRight);
-		browser.assertElementTextVisible(modelValueXpathRight, text);
-		browser.assertElementVisible(immediateMessageRight);
+		browser.sendKeys(input2Xpath, text);
+		browser.performAndWaitForAjaxRerender(browser.createClickAction(submitButton2Xpath), modelValue2Xpath);
+		SeleniumAssert.assertElementTextVisible(browser, modelValue2Xpath, text);
+		SeleniumAssert.assertElementVisible(browser, immediateMessage2Xpath);
 	}
 }

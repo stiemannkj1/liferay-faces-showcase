@@ -25,8 +25,7 @@ import com.liferay.faces.showcase.dto.SelectedComponent;
 import com.liferay.faces.showcase.dto.SelectedComponentImpl;
 import com.liferay.faces.showcase.dto.ShowcaseComponent;
 import com.liferay.faces.util.product.Product;
-import com.liferay.faces.util.product.ProductConstants;
-import com.liferay.faces.util.product.ProductMap;
+import com.liferay.faces.util.product.ProductFactory;
 
 
 /**
@@ -41,8 +40,8 @@ public class ShowcaseModelBean implements Serializable {
 
 	static {
 
-		final Product LIFERAY_PORTAL = ProductMap.getInstance().get(ProductConstants.LIFERAY_PORTAL);
-		final Product ALLOY = ProductMap.getInstance().get(ProductConstants.LIFERAY_FACES_ALLOY);
+		final Product LIFERAY_PORTAL = ProductFactory.getProduct(Product.Name.LIFERAY_PORTAL);
+		final Product ALLOY = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_ALLOY);
 		final boolean LIFERAY_PORTAL_6_2_DETECTED = LIFERAY_PORTAL.isDetected() &&
 			((LIFERAY_PORTAL.getMajorVersion() == 6) && (LIFERAY_PORTAL.getMinorVersion() == 2));
 		final boolean ALLOY_2_DETECTED = ALLOY.isDetected() && (ALLOY.getMajorVersion() == 2);
@@ -53,8 +52,8 @@ public class ShowcaseModelBean implements Serializable {
 	private static final long serialVersionUID = 3339667513222866249L;
 
 	// Private Constants
-	private static final boolean LIFERAY_FACES_BRIDGE_DETECTED = ProductMap.getInstance().get(
-			ProductConstants.LIFERAY_FACES_BRIDGE).isDetected();
+	private static final boolean LIFERAY_FACES_BRIDGE_DETECTED = ProductFactory.getProduct(
+			Product.Name.LIFERAY_FACES_BRIDGE).isDetected();
 
 	// Injections
 	@ManagedProperty(name = "listModelBean", value = "#{listModelBean}")
@@ -65,10 +64,6 @@ public class ShowcaseModelBean implements Serializable {
 	private SelectedComponent selectedComponent;
 	private String sourceControlURL;
 	private ViewParameters viewParameters;
-
-	public boolean isBootstrap2() {
-		return BOOTSTRAP_2;
-	}
 
 	public String getDeploymentType() {
 
@@ -83,10 +78,6 @@ public class ShowcaseModelBean implements Serializable {
 		}
 
 		return deploymentType;
-	}
-
-	public void setListModelBean(ListModelBean listModelBean) {
-		this.listModelBean = listModelBean;
 	}
 
 	public SelectedComponent getSelectedComponent() {
@@ -172,6 +163,14 @@ public class ShowcaseModelBean implements Serializable {
 		return viewParameters;
 	}
 
+	public boolean isBootstrap2() {
+		return BOOTSTRAP_2;
+	}
+
+	public void setListModelBean(ListModelBean listModelBean) {
+		this.listModelBean = listModelBean;
+	}
+
 	public static class ViewParameters implements Serializable {
 
 		// serialVersionUID
@@ -186,28 +185,28 @@ public class ShowcaseModelBean implements Serializable {
 			return componentName;
 		}
 
-		public void setComponentName(String componentName) {
-			this.componentName = componentName;
-		}
-
 		public String getComponentPrefix() {
 			return componentPrefix;
-		}
-
-		public void setComponentPrefix(String componentPrefix) {
-			this.componentPrefix = componentPrefix;
 		}
 
 		public String getComponentUseCase() {
 			return componentUseCase;
 		}
 
-		public void setComponentUseCase(String componentUseCase) {
-			this.componentUseCase = componentUseCase;
-		}
-
 		public boolean isValid() {
 			return ((componentPrefix != null) && (componentName != null));
+		}
+
+		public void setComponentName(String componentName) {
+			this.componentName = componentName;
+		}
+
+		public void setComponentPrefix(String componentPrefix) {
+			this.componentPrefix = componentPrefix;
+		}
+
+		public void setComponentUseCase(String componentUseCase) {
+			this.componentUseCase = componentUseCase;
 		}
 	}
 }
