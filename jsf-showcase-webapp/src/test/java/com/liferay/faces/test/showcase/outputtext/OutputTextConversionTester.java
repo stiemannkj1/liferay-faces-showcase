@@ -28,7 +28,8 @@ import com.liferay.faces.test.showcase.output.OutputTester;
 
 
 /**
- * @author  Neil Griffin
+ * @author  Kyle Stiemann
+ * @author  Philip White
  */
 public class OutputTextConversionTester extends OutputTester {
 
@@ -48,7 +49,6 @@ public class OutputTextConversionTester extends OutputTester {
 		dateFormat.setTimeZone(gmtTimeZone);
 
 		String todayString = dateFormat.format(today);
-		String exampleConversionDate1Xpath = "(//div[@class='showcase-example-usage'][text()])";
-		SeleniumAssert.assertElementTextVisible(browser, exampleConversionDate1Xpath, todayString);
+		SeleniumAssert.assertElementTextVisible(browser, exampleText1Xpath, todayString);
 	}
 }

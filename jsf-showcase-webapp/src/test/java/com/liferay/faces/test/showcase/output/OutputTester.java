@@ -23,13 +23,13 @@ import com.liferay.faces.test.showcase.TesterBase;
 
 
 /**
- * @author  Neil Griffin
+ * @author  Kyle Stiemann
+ * @author  Philip White
  */
 public class OutputTester extends TesterBase {
 
 	protected static final String exampleText1Xpath = "(//div[@class='showcase-example-usage'])[1]";
 	protected static final String input1Xpath = "(//input[contains(@id,':inputText')])[1]";
-	protected static final String submitButton1Xpath = "(//input[contains(@value,'Submit and Re-Render')][1])";
 
 	protected void testCharCountMessage(Browser browser, String inputXpath, String submitButtonXpath,
 		String messageXpath) {

@@ -24,7 +24,8 @@ import com.liferay.faces.test.selenium.assertion.SeleniumAssert;
 
 
 /**
- * @author  Neil Griffin
+ * @author  Kyle Stiemann
+ * @author  Philip White
  */
 public class OutputLinkConversionTester extends OutputLinkTester {
 
@@ -42,7 +43,7 @@ public class OutputLinkConversionTester extends OutputLinkTester {
 		Select select = new Select(browser.findElementByXpath(select1Xpath));
 		select.selectByVisibleText("United States");
 
-		String mapLink1Xpath = "(//a[contains(text(),'United States')])";
+		String mapLink1Xpath = "//a[contains(., 'United States')]";
 		browser.waitForElementVisible(mapLink1Xpath);
 		browser.centerElementInView(mapLink1Xpath);
 		SeleniumAssert.assertElementTextVisible(browser, mapLink1Xpath, "Link to a map of United States");

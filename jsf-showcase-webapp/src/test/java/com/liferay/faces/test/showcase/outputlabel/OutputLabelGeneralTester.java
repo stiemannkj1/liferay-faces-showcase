@@ -23,7 +23,8 @@ import com.liferay.faces.test.showcase.output.OutputTester;
 
 
 /**
- * @author  Neil Griffin
+ * @author  Kyle Stiemann
+ * @author  Philip White
  */
 public class OutputLabelGeneralTester extends OutputTester {
 
@@ -39,7 +40,7 @@ public class OutputLabelGeneralTester extends OutputTester {
 		// Test that the web page shows an error message when an empty value is submitted.
 		browser.clickAndWaitForAjaxRerender(submitButton1Xpath);
 
-		String valueRequiredText = "firstName: Validation Error: Value is required.";
+		String valueRequiredText = "Name: Validation Error: Value is required.";
 		String field1Xpath = "(//div[@class='showcase-example-usage'])[1]/div";
 		SeleniumAssert.assertElementTextVisible(browser, field1Xpath, valueRequiredText);
 
