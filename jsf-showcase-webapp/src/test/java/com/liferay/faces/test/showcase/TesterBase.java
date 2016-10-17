@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.liferay.faces.test.selenium.Browser;
 import com.liferay.faces.test.selenium.IntegrationTesterBase;
@@ -100,7 +101,8 @@ public class TesterBase extends IntegrationTesterBase {
 			// Since pluto does not support friendly URLs, obtain the "general" use case URL from the showcase accordion
 			// and replace "general" with the specified use case. Note: non-"general" use cases are shown conditionally
 			// so we cannot rely on those links being present, but the "general" use case links are always present.
-			String componentLinkXpath = "//a[contains(@href, 'general') and normalize-space(text())='" +
+			String componentLinkXpath =
+				"//a[contains(@href, 'general')][contains(@class,'showcase-link')][normalize-space(text())='" +
 				componentPrefix + ":" + componentName + "']";
 			List<WebElement> componentLinkElements = browser.findElements(By.xpath(componentLinkXpath));
 
@@ -109,6 +111,9 @@ public class TesterBase extends IntegrationTesterBase {
 			if (componentLinkElements.isEmpty()) {
 
 				browser.get(TEST_CONTEXT_URL);
+				waitForShowcasePageReady(browser);
+				browser.click("//img[contains(@src,'max.png')]/parent::a[contains(@href,'maximized')]");
+				waitForShowcasePageReady(browser);
 				componentLinkElements = browser.findElements(By.xpath(componentLinkXpath));
 			}
 
@@ -132,6 +137,8 @@ public class TesterBase extends IntegrationTesterBase {
 			browser.get(TEST_CONTEXT_URL + "/" + componentPrefix + "/" + componentName.toLowerCase(Locale.ENGLISH) +
 				"/" + componentUseCase);
 		}
+
+		waitForShowcasePageReady(browser);
 	}
 
 	/**
@@ -144,5 +151,9 @@ public class TesterBase extends IntegrationTesterBase {
 		browser.click(requiredCheckbox1Xpath);
 		browser.clickAndWaitForAjaxRerender(submitButton1Xpath);
 		SeleniumAssert.assertElementVisible(browser, valueIsRequiredError1Xpath);
+	}
+
+	protected void waitForShowcasePageReady(Browser browser) {
+		browser.waitUntil(ExpectedConditions.jsReturnsValue("return window.liferay_faces_showcase_ready;"));
 	}
 }
