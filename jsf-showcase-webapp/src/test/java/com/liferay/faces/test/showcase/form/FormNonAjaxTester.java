@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.liferay.faces.test.showcase.outputlink;
+package com.liferay.faces.test.showcase.form;
 
 import org.junit.Test;
-
-import org.openqa.selenium.support.ui.Select;
 
 import com.liferay.faces.test.selenium.Browser;
 import com.liferay.faces.test.selenium.assertion.SeleniumAssert;
@@ -28,24 +26,18 @@ import com.liferay.faces.test.showcase.TesterBase;
  * @author  Kyle Stiemann
  * @author  Philip White
  */
-public class OutputLinkConversionTester extends TesterBase {
+public class FormNonAjaxTester extends TesterBase {
 
 	@Test
-	public void runOutputLinkConversionTest() throws Exception {
+	public void runFormNonAjaxTest() throws Exception {
 
 		Browser browser = Browser.getInstance();
-		navigateToUseCase(browser, "outputLink", "conversion");
+		navigateToUseCase(browser, "form", "non-ajax");
 
-		// Test that selecting a different country changes the text in the link.
-		Select select = new Select(browser.findElementByXpath("(//select[contains(@id,':selectOneMenuId')])"));
-		select.selectByVisibleText("United States");
-
-		String mapLink1Xpath = "//a[contains(., 'United States')]";
-		browser.waitForElementVisible(mapLink1Xpath);
-		SeleniumAssert.assertElementTextVisible(browser, mapLink1Xpath, "Link to a map of United States");
-
-		// Click the link and check that it opens a new window/tab with the correct domain name.
-		browser.centerElementInView(mapLink1Xpath);
-		testLink(browser, mapLink1Xpath, "google.com");
+		// Test that the form submits successfully.
+		browser.click("(//*[contains(text(),'Submit') or contains(@value,'Submit')])[1]");
+		waitForShowcasePageReady(browser);
+		SeleniumAssert.assertElementVisible(browser,
+			"//td[contains(text(),'The form was submitted as a full page postback and the entire page was re-rendered.')]");
 	}
 }
