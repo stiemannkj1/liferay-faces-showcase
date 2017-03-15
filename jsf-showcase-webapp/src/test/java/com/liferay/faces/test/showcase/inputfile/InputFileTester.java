@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2016 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.liferay.faces.test.showcase.inputfile;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.liferay.faces.test.selenium.Browser;
+import com.liferay.faces.test.selenium.TestUtil;
 import com.liferay.faces.test.selenium.assertion.SeleniumAssert;
 import com.liferay.faces.test.showcase.input.InputTester;
 
@@ -29,11 +30,10 @@ import com.liferay.faces.test.showcase.input.InputTester;
 public class InputFileTester extends InputTester {
 
 	// Private Constants
-	private static final String LIFERAY_JSF_JERSEY_PNG_FILE_PATH = System.getProperty("java.io.tmpdir") +
-		"liferay-jsf-jersey.png";
+	private static final String LIFERAY_JSF_JERSEY_PNG_FILE_PATH = TestUtil.JAVA_IO_TMPDIR + "liferay-jsf-jersey.png";
 	private static final String PHANTOMJS_ALERT_CONFIRMATION_WORKAROUND =
 		"window.alert = function(msg){ console.log(msg); };" +
-		"window.confirm = function(msg){console.log(msg); return true;};";
+		"window.confirm = function(msg){ console.log(msg); return true; };";
 
 	// Private Xpaths
 	private static final String fileUploadChooserXpath = "//input[@type='file']";
@@ -41,26 +41,41 @@ public class InputFileTester extends InputTester {
 	private static final String deleteFileXpath =
 		"(//input[contains(@src,'icon-delete.png')]|//button/span[contains(@class,'trash')])";
 
-	protected void runInputFileTest(boolean ajax) {
+	protected void runInputFileTest(String useCase) {
+		runInputFileTest(null, useCase);
+	}
+
+	protected void runInputFileTest(String componentPrefix, String useCase) {
 
 		Browser browser = Browser.getInstance();
-		String useCase = "general";
 
-		if (ajax) {
-			useCase = "instant-ajax";
+		if (componentPrefix != null) {
+			navigateToUseCase(browser, componentPrefix, "inputFile", useCase);
+		}
+		else {
+			navigateToUseCase(browser, "inputFile", useCase);
 		}
 
-		navigateToUseCase(browser, "inputFile", useCase);
+		String browserName = browser.getName();
+
+		// Workaround https://github.com/ariya/phantomjs/issues/10993 by removing the multiple attribute from <input
+		// type="file" />
+		if (browserName.equals("phantomjs")) {
+
+			browser.executeScript(
+				"var multipleFileUploadElements = document.querySelectorAll('input[type=\"file\"][multiple]');" +
+				"for (var i = 0; i < multipleFileUploadElements.length; i++) {" +
+				"multipleFileUploadElements[i].removeAttribute('multiple'); }");
+		}
+
 		browser.sendKeys(fileUploadChooserXpath, LIFERAY_JSF_JERSEY_PNG_FILE_PATH);
 
-		if (!ajax) {
+		if (!useCase.equals("instant-ajax")) {
 			browser.click(submitButton1Xpath);
 		}
 
 		browser.waitForElementVisible(uploadedFileXpath);
 		SeleniumAssert.assertElementTextVisible(browser, uploadedFileXpath, "jersey");
-
-		String browserName = browser.getName();
 
 		// Workaround https://github.com/detro/ghostdriver/issues/20: Implement all the Session Commands related to JS
 		// Alert, Prompt and Confirm.

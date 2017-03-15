@@ -13,6 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.liferay.faces.test.showcase;
 
 import java.util.HashSet;
@@ -26,9 +41,11 @@ import java.util.logging.Logger;
 import org.junit.Assert;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 
 import com.liferay.faces.test.selenium.Browser;
 import com.liferay.faces.test.selenium.IntegrationTesterBase;
@@ -65,6 +82,9 @@ public class TesterBase extends IntegrationTesterBase {
 
 	// Private Constants
 	private static final String CONTAINER = TestUtil.getContainer("tomcat");
+	private static final String FIRE_SELECT_CHANGE_EVENT_SCRIPT =
+		"var changeEvent = document.createEvent('HTMLEvents');" +
+		"changeEvent.initEvent('change', true, true); arguments[0].parentNode.dispatchEvent(changeEvent);";
 	private static final boolean SIGN_IN;
 
 	static {
@@ -91,12 +111,75 @@ public class TesterBase extends IntegrationTesterBase {
 		SIGN_IN = signIn;
 	}
 
+	protected void assertImageRendered(Browser browser, String imageXpath) {
+
+		SeleniumAssert.assertElementVisible(browser, imageXpath);
+
+		WebElement image = browser.findElementByXpath(imageXpath);
+		String imageSrc = image.getAttribute("src");
+		Assert.assertTrue("Image src " + imageSrc + " is not a valid JSF resource URL.",
+			imageSrc.matches(".*javax.faces.resource\\p{Punct}[a-z-]+[.]png.*") &&
+			imageSrc.matches(".*ln\\p{Punct}images.*"));
+
+		Boolean imageRendered = (Boolean) browser.executeScript(
+				"return arguments[0].complete && typeof arguments[0].naturalWidth != 'undefined' && arguments[0].naturalWidth > 0",
+				image);
+		Assert.assertTrue("Image " + imageXpath + " (src=\"" + imageSrc + "\") is not rendered in the DOM.",
+			imageRendered);
+	}
+
+	/**
+	 * Click an option and wait for Ajax to rerender the option. This method exists because {@link
+	 * Browser#clickAndWaitForAjaxRerender(java.lang.String)} does not work on selectOneMenu, selectManyListbox, and
+	 * SelectManyMenu. For more information see method comments.
+	 */
+	protected void clickOptionAndWaitForAjaxRerender(Browser browser, String optionXpath) {
+
+		// some tests occasionally fail due to elements moving off screen, so center the element in the view.
+		if (this.getClass().getName().contains("Menu") || this.getClass().getName().contains("DataTable")) {
+			browser.centerElementInView(optionXpath);
+		}
+
+		WebElement optionElement = browser.findElementByXpath(optionXpath);
+
+		// Note: clicking a selectOneMenu option on Chrome and PhantomJS via Actions.click(WebElement) (which is used
+		// by Browser.clickAndWaitForAjaxRerender(String)) does not fire the select element's change event, so the
+		// element must be clicked via Element.click().
+		optionElement.click();
+
+		// phantomjs browser does not fire a change event when a <select multiple="multiple"> <option> is clicked, so
+		// the event must be fired manually.
+		if ("phantomjs".equals(browser.getName())) {
+
+			try {
+
+				WebElement selectElement = optionElement.findElement(By.xpath(".."));
+				Select select = new Select(selectElement);
+
+				if (select.isMultiple()) {
+					browser.executeScript(FIRE_SELECT_CHANGE_EVENT_SCRIPT, optionElement);
+				}
+			}
+			catch (StaleElementReferenceException e) {
+				// do nothing. The element is stale because an ajax rerender has correctly occured.
+			}
+		}
+
+		browser.waitUntil(ExpectedConditions.stalenessOf(optionElement));
+		browser.waitForElementVisible(optionXpath);
+	}
+
 	@Override
 	protected void doSetUp() {
 
 		if (SIGN_IN) {
 			signIn(Browser.getInstance(), CONTAINER);
 		}
+	}
+
+	protected String getExampleImageXpath(String exampleLabelText) {
+		return "//label[contains(.,'Example')][contains(.,'" + exampleLabelText +
+			"')]/ancestor::div[@class='showcase-example']//img[contains(@src,'javax.faces.resource')][contains(@src,'ln=images') or contains(@src,'ln:images')]";
 	}
 
 	protected void navigateToUseCase(Browser browser, String componentName, String componentUseCase) {
