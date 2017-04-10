@@ -165,6 +165,31 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>chromium</id>
+			<properties>
+				<integration.browser>chromium</integration.browser>
+			</properties>
+			<dependencies>
+<dependency>
+         <groupId>org.seleniumhq.selenium</groupId>
+         <artifactId>selenium-api</artifactId>
+         <version>2.53.1</version>
+         <scope>compile</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.seleniumhq.selenium</groupId>
+         <artifactId>selenium-java</artifactId>
+         <version>2.53.1</version>
+      </dependency>
+				<dependency>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-chrome-driver</artifactId>
+					<version>2.53.1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>htmlunit</id>
 			<properties>
 				<integration.browser>htmlunit</integration.browser>
