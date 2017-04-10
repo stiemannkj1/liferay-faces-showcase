@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2016 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.liferay.faces.test.showcase.buttonlink.ButtonLinkTester;
 public class CommandLinkNavigationParamTester extends ButtonLinkTester {
 
 	@Test
-	public void runCommandLinkNavigationTest() throws Exception {
+	public void runCommandLinkNavigationParamTest() throws Exception {
 		runButtonLinkNavigationParamTest("commandLink");
 	}
 }

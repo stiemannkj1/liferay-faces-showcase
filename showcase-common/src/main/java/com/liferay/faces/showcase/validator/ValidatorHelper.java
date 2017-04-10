@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2016 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.liferay.faces.showcase.validator;
 import java.util.Locale;
 
 import javax.faces.component.UIViewRoot;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import com.liferay.faces.util.i18n.I18n;
@@ -31,7 +32,8 @@ public class ValidatorHelper {
 
 	public static String getMessage(FacesContext facesContext, String messageId) {
 
-		I18n i18n = I18nFactory.getI18nInstance();
+		ExternalContext externalContext = facesContext.getExternalContext();
+		I18n i18n = I18nFactory.getI18nInstance(externalContext);
 		UIViewRoot viewRoot = facesContext.getViewRoot();
 		Locale locale = viewRoot.getLocale();
 

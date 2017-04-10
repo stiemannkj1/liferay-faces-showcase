@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2016 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package com.liferay.faces.test.showcase.outputstylesheet;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.openqa.selenium.WebElement;
 
 import com.liferay.faces.test.selenium.Browser;
@@ -56,7 +55,7 @@ public class OutputStylesheetGeneralTester extends OutputTester {
 		buttonElement = browser.findElementByXpath(button2Xpath);
 
 		String buttonDisplay = buttonElement.getCssValue("display");
-		Assert.assertEquals("The button's display is not block, instead it is " + buttonDisplay, "block",
-			buttonDisplay);
+		Assert.assertTrue("The button's display is not block, instead it is " + buttonDisplay,
+			buttonDisplay.contains("block"));
 	}
 }
