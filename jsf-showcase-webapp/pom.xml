@@ -39,9 +39,91 @@
 		<profile>
 			<id>thin-wab</id>
 			<properties>
+				<maven.war.webxml>${basedir}/src/main/webapp/WEB-INF/thin-wab-web.xml</maven.war.webxml>
 				<war.dependency.scope>provided</war.dependency.scope>
 				<mojarra.war.dependency.scope>provided</mojarra.war.dependency.scope>
+				<faces.servlet.container.initializer>com.sun.faces.config.FacesInitializer</faces.servlet.container.initializer>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>biz.aQute.bnd</groupId>
+						<artifactId>bnd-maven-plugin</artifactId>
+						<version>3.5.0</version>
+						<configuration>
+							<bnd>
+								<![CDATA[
+									-includeresource: \
+										WEB-INF/lib/com.liferay.faces.demo.showcase.common-${project.version}.jar=\
+											com.liferay.faces.demo.showcase.common-${project.version}.jar;lib:=true
+									# XML imports are necessary for prettyfaces.
+									# JSP imports are necessary for Mojarra even though this webapp doesn't use JSP.
+									# EL imports are necessary for Mojarra.
+									Import-Package: \
+										!com.liferay.faces.showcase.*,\
+										javax.xml.parsers,\
+										javax.xml.validation,\
+										org.xml.sax,\
+										org.xml.sax.helpers,\
+										javax.annotation;version="[1.2.0,2.0.0)",\
+										javax.el;version="[2.2.0,4.0.0)",\
+										com.sun.el,\
+										javax.naming,\
+										javax.servlet,\
+										javax.servlet.jsp,\
+										javax.servlet.jsp.*,\
+										javax.faces.view;version="[2.2,3)",\
+										javax.faces.webapp;version="[2.2,3)",\
+										com.sun.faces.config;version="[2.2,3)",\
+										*
+									# Including dot (".") is necessary to ensure that the bnd-maven-plugin adds imports
+									# from this war's classes. The -includeresource instruction includes
+									# showcase-common so there is no need to include it here.
+									Bundle-ClassPath: .,WEB-INF/classes,WEB-INF/lib/prettyfaces-jsf2-3.3.3.jar
+									Web-ContextPath: /${project.artifactId}
+								]]>
+							</bnd>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>bnd-process</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<mkdir dir="${project.build.outputDirectory}/META-INF/services" />
+										<echo message="${faces.servlet.container.initializer}"
+											  file="${project.build.outputDirectory}/META-INF/services/javax.servlet.ServletContainerInitializer" />
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>delete-duplicate-files</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<delete dir="${project.build.outputDirectory}/WEB-INF" />
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 			<dependencies>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
@@ -180,6 +262,16 @@
 					<artifactId>javax.faces</artifactId>
 					<version>${mojarra.version}</version>
 					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>com.liferay.faces</groupId>
+					<artifactId>com.liferay.faces.util</artifactId>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>com.ocpsoft</groupId>
+					<artifactId>prettyfaces-jsf2</artifactId>
+					<version>3.3.3</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -444,7 +536,6 @@
 			<groupId>com.liferay.faces.demo</groupId>
 			<artifactId>com.liferay.faces.demo.showcase.common</artifactId>
 			<version>${project.version}</version>
-			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

@@ -169,7 +169,9 @@
 					<artifactId>maven-war-plugin</artifactId>
 					<version>2.3</version>
 					<configuration>
+						<useDefaultManifestFile>true</useDefaultManifestFile>
 						<archive>
+							<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
 							<manifestEntries>
 								<Built-By>Release Manager</Built-By>
 								<Implementation-Title>${project.name}</Implementation-Title>
@@ -181,6 +183,7 @@
 						<dependentWarExcludes>WEB-INF/lib/*</dependentWarExcludes>
 						<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 						<warName>${war.name}</warName>
+						<packagingExcludes>**/thin-wab-web.xml</packagingExcludes>
 					</configuration>
 				</plugin>
 				<plugin>
