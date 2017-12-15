@@ -33,7 +33,7 @@ Currently the only OSGi container that has been tested is [Equinox Oxygen.1](htt
 
 		mvn clean install -P thin-wab
 
-4. Install and **start** the Jetty bundles necessary to create a servlet container (**Note:** you may need to replace `$HOME` with your literal home directory if the OSGi container cannot expand environment variables):  
+4. Install and **start** the Jetty bundles necessary to create a servlet container (**Note:** you may need to replace `$HOME` with your literal home directory if the OSGi container cannot expand environment variables):
 
 	```
 	install file:$HOME/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar
