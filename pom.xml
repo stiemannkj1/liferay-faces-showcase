@@ -91,8 +91,10 @@
 		<faces.version>${mojarra.version}</faces.version>
 		<full.version>${project.version} (${timestamp} AD)</full.version>
 		<log4j.version>1.2.14</log4j.version>
+		<manifest.mf></manifest.mf>
 		<mojarra.version>2.2.14</mojarra.version>
 		<myfaces.version>UNSUPPORTED</myfaces.version>
+		<prettyfaces.version>3.3.3</prettyfaces.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<surefire.version>2.12</surefire.version>
@@ -171,7 +173,7 @@
 					<configuration>
 						<useDefaultManifestFile>true</useDefaultManifestFile>
 						<archive>
-							<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+							<manifestFile>${manifest.mf}</manifestFile>
 							<manifestEntries>
 								<Built-By>Release Manager</Built-By>
 								<Implementation-Title>${project.name}</Implementation-Title>
@@ -424,7 +426,7 @@
 			<dependency>
 				<groupId>com.ocpsoft</groupId>
 				<artifactId>prettyfaces-jsf2</artifactId>
-				<version>3.3.3</version>
+				<version>${prettyfaces.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

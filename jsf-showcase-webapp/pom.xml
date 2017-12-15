@@ -39,10 +39,12 @@
 		<profile>
 			<id>thin-wab</id>
 			<properties>
-				<maven.war.webxml>${basedir}/src/main/webapp/WEB-INF/thin-wab-web.xml</maven.war.webxml>
-				<war.dependency.scope>provided</war.dependency.scope>
-				<mojarra.war.dependency.scope>provided</mojarra.war.dependency.scope>
 				<faces.servlet.container.initializer>com.sun.faces.config.FacesInitializer</faces.servlet.container.initializer>
+				<jetty.version>9.4.8.v20171121</jetty.version>
+				<manifest.mf>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifest.mf>
+				<maven.war.webxml>${basedir}/src/main/webapp/WEB-INF/thin-wab-web.xml</maven.war.webxml>
+				<mojarra.war.dependency.scope>provided</mojarra.war.dependency.scope>
+				<war.dependency.scope>provided</war.dependency.scope>
 			</properties>
 			<build>
 				<plugins>
@@ -56,7 +58,7 @@
 									-includeresource: \
 										WEB-INF/lib/com.liferay.faces.demo.showcase.common-${project.version}.jar=\
 											com.liferay.faces.demo.showcase.common-${project.version}.jar;lib:=true
-									# XML imports are necessary for prettyfaces.
+									# XML imports are necessary for PrettyFaces.
 									# JSP imports are necessary for Mojarra even though this webapp doesn't use JSP.
 									# EL imports are necessary for Mojarra.
 									Import-Package: \
@@ -79,7 +81,7 @@
 									# Including dot (".") is necessary to ensure that the bnd-maven-plugin adds imports
 									# from this war's classes. The -includeresource instruction includes
 									# showcase-common so there is no need to include it here.
-									Bundle-ClassPath: .,WEB-INF/classes,WEB-INF/lib/prettyfaces-jsf2-3.3.3.jar
+									Bundle-ClassPath: .,WEB-INF/classes,WEB-INF/lib/prettyfaces-jsf2-${prettyfaces.version}.jar
 									Web-ContextPath: /${project.artifactId}
 								]]>
 							</bnd>
@@ -128,61 +130,61 @@
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-util</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-http</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-io</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-security</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-server</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-servlet</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-webapp</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-deploy</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-xml</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty.osgi</groupId>
 					<artifactId>jetty-osgi-boot</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
@@ -206,7 +208,7 @@
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-jndi</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
@@ -218,13 +220,13 @@
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-plus</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.eclipse.jetty</groupId>
 					<artifactId>jetty-annotations</artifactId>
-					<version>9.4.8.v20171121</version>
+					<version>${jetty.version}</version>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
@@ -271,7 +273,6 @@
 				<dependency>
 					<groupId>com.ocpsoft</groupId>
 					<artifactId>prettyfaces-jsf2</artifactId>
-					<version>3.3.3</version>
 				</dependency>
 			</dependencies>
 		</profile>
