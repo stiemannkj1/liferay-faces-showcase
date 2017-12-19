@@ -42,7 +42,7 @@
 				<faces.servlet.container.initializer>com.sun.faces.config.FacesInitializer</faces.servlet.container.initializer>
 				<jetty.version>9.4.8.v20171121</jetty.version>
 				<manifest.mf>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifest.mf>
-				<maven.war.webxml>${basedir}/src/main/webapp/WEB-INF/thin-wab-web.xml</maven.war.webxml>
+				<maven.war.webxml>${basedir}/src/main/webapp/WEB-INF/web-thin-wab.xml</maven.war.webxml>
 				<mojarra.war.dependency.scope>provided</mojarra.war.dependency.scope>
 				<war.dependency.scope>provided</war.dependency.scope>
 			</properties>
