@@ -73,7 +73,6 @@
 										javax.naming,\
 										javax.servlet,\
 										javax.servlet.jsp,\
-										javax.servlet.jsp.*,\
 										javax.faces.view;version="[2.2,3)",\
 										javax.faces.webapp;version="[2.2,3)",\
 										com.sun.faces.config;version="[2.2,3)",\
