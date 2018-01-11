@@ -80,6 +80,8 @@ Currently the only OSGi container that has been tested is [Equinox Oxygen.1](htt
 7. Install and **start** the bundles necessary to enable JSF in webapps:
 
 	```
+	install file:./plugins/org.apache.felix.scr_2.0.10.v20170501-2007.jar
+	install file:./plugins/org.eclipse.equinox.ds_1.5.0.v20170307-1429.jar
 	install file:$HOME/.m2/repository/com/liferay/faces/com.liferay.faces.osgi.weaver/1.0.0-SNAPSHOT/com.liferay.faces.osgi.weaver-1.0.0-SNAPSHOT.jar
 	install file:plugins/javax.el_2.2.0.v201303151357.jar
 	install file:$HOME/.m2/repository/org/glassfish/web/el-impl/2.2/el-impl-2.2.jar
