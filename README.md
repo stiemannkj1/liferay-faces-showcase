@@ -67,9 +67,7 @@ Currently the only OSGi container that has been tested is [Equinox Oxygen.1](htt
 	install file:$HOME/.m2/repository/org/apache/aries/spifly/org.apache.aries.spifly.dynamic.bundle/1.0.10/org.apache.aries.spifly.dynamic.bundle-1.0.10.jar
 	install file:$HOME/.m2/repository/org/eclipse/jetty/jetty-jndi/9.4.8.v20171121/jetty-jndi-9.4.8.v20171121.jar
 	install file:$HOME/.m2/repository/org/eclipse/jetty/cdi/cdi-core/9.4.8.v20171121/cdi-core-9.4.8.v20171121.jar
-	install file:$HOME/.m2/repository/javax/interceptor/javax.interceptor-api/1.2.1/javax.interceptor-api-1.2.1.jar
-	install file:$HOME/.m2/repository/org/jboss/weld/weld-osgi-bundle/1.1.34.Final/weld-osgi-bundle-1.1.34.Final.jar
-	install file:$HOME/.m2/repository/javax/transaction/javax.transaction-api/1.2/javax.transaction-api-1.2.jar
+	install file:$HOME/.m2/repository/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar
 	install file:$HOME/.m2/repository/org/eclipse/jetty/jetty-plus/9.4.8.v20171121/jetty-plus-9.4.8.v20171121.jar
 	install file:$HOME/.m2/repository/javax/annotation/javax.annotation-api/1.2/javax.annotation-api-1.2.jar
 	install file:$HOME/.m2/repository/org/eclipse/jetty/jetty-annotations/9.4.8.v20171121/jetty-annotations-9.4.8.v20171121.jar
