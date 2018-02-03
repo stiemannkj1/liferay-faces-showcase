@@ -60,7 +60,7 @@ public class I18nShowcaseImpl extends I18nWrapper implements Serializable {
 		String message = super.getMessage(facesContext, locale, messageId);
 
 		if (message != null) {
-			message = ShowcaseUtil.encodeDescription(message);
+			message = ShowcaseUtil.encodeDescription(facesContext, message);
 		}
 
 		return message;

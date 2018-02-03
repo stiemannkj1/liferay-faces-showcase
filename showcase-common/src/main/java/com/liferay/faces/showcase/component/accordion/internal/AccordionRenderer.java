@@ -32,8 +32,6 @@ import com.liferay.faces.showcase.util.ShowcaseUtil;
 import com.liferay.faces.util.component.Styleable;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
-import com.liferay.faces.util.product.Product;
-import com.liferay.faces.util.product.ProductFactory;
 import com.liferay.faces.util.render.RendererUtil;
 
 
@@ -52,10 +50,6 @@ import com.liferay.faces.util.render.RendererUtil;
 )
 //J+
 public class AccordionRenderer extends AccordionRendererBase {
-
-	// Private Constants
-	private static final boolean LIFERAY_PORTAL_DETECTED = ProductFactory.getProduct(Product.Name.LIFERAY_PORTAL)
-		.isDetected();
 
 	// Logger
 	private static final Logger logger = LoggerFactory.getLogger(AccordionRenderer.class);
@@ -144,15 +138,6 @@ public class AccordionRenderer extends AccordionRendererBase {
 		// Encode the closing </div> element for the accordion.
 		ResponseWriter responseWriter = facesContext.getResponseWriter();
 		responseWriter.endElement("div");
-
-		String escapedClientId;
-
-		if (LIFERAY_PORTAL_DETECTED) {
-			escapedClientId = ShowcaseUtil.doubleEscapeClientId(uiComponent.getClientId());
-		}
-		else {
-			escapedClientId = ShowcaseUtil.singleEscapeClientId(uiComponent.getClientId());
-		}
 	}
 
 	@Override

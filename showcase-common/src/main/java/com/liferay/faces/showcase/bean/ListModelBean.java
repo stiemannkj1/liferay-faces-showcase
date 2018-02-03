@@ -28,12 +28,12 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.ProjectStage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
 
 import com.liferay.faces.showcase.dto.CodeExample;
 import com.liferay.faces.showcase.dto.ShowcaseComponent;
@@ -41,6 +41,7 @@ import com.liferay.faces.showcase.dto.ShowcaseComponentComparator;
 import com.liferay.faces.showcase.dto.ShowcaseComponentImpl;
 import com.liferay.faces.showcase.dto.UseCase;
 import com.liferay.faces.showcase.util.CodeExampleUtil;
+import com.liferay.faces.util.factory.FactoryExtensionFinder;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.product.Product;
@@ -50,18 +51,17 @@ import com.liferay.faces.util.product.ProductFactory;
 /**
  * @author  Neil Griffin
  */
-@ManagedBean(eager = true)
+@ManagedBean(name = ListModelBean.BEAN_NAME, eager = true)
 @ApplicationScoped
 public class ListModelBean {
 
 	// Logger
 	private static final Logger logger = LoggerFactory.getLogger(ListModelBean.class);
 
+	// Public Constants
+	public static final String BEAN_NAME = "listModelBean";
+
 	// Private Constants
-	private static final Product LIFERAY_FACES_ALLOY = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_ALLOY);
-	private static final Product LIFERAY_FACES_BRIDGE = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_BRIDGE);
-	private static final Product LIFERAY_FACES_METAL = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_METAL);
-	private static final Product LIFERAY_FACES_PORTAL = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_PORTAL);
 	private static final String[] PACKAGE_NAMES = new String[] {
 			"com.liferay.faces.bridge.demos.bean", "com.liferay.faces.showcase.bean",
 			"com.liferay.faces.showcase.constants", "com.liferay.faces.showcase.dto",
@@ -95,15 +95,28 @@ public class ListModelBean {
 		return showcaseCategoryMap;
 	}
 
-	@PostConstruct
-	public void postConstruct() {
+	/**
+	 * Initialization must occur after the {@link com.liferay.faces.util.config.ApplicationConfig} is constructed
+	 * (rather than in the constructor or a {@link javax.annotation.PostConstruct}) to ensure that Util factories have
+	 * been initialized. This method is called during {@link
+	 * com.liferay.faces.showcase.event.PostConstructApplicationConfigEventListener#processEvent(javax.faces.event.SystemEvent)
+	 * }.
+	 *
+	 * @param  facesContext
+	 */
+	public void postConstructApplicationConfigEvent(FacesContext facesContext) throws AbortProcessingException {
 
-		FacesContext startupFacesContext = FacesContext.getCurrentInstance();
-		boolean developmentMode = startupFacesContext.isProjectStage(ProjectStage.Development);
-		boolean productionMode = startupFacesContext.isProjectStage(ProjectStage.Production);
+		boolean developmentMode = facesContext.isProjectStage(ProjectStage.Development);
+		boolean productionMode = facesContext.isProjectStage(ProjectStage.Production);
 		showcaseCategoryList = new ArrayList<String>();
 
-		if (LIFERAY_FACES_PORTAL.isDetected()) {
+		ExternalContext externalContext = facesContext.getExternalContext();
+		ProductFactory productFactory = (ProductFactory) FactoryExtensionFinder.getFactory(externalContext,
+				ProductFactory.class);
+		final Product LIFERAY_FACES_PORTAL = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_PORTAL);
+		final boolean LIFERAY_FACES_PORTAL_DETECTED = LIFERAY_FACES_PORTAL.isDetected();
+
+		if (LIFERAY_FACES_PORTAL_DETECTED) {
 			showcaseCategoryList.add("input");
 			showcaseCategoryList.add("misc");
 		}
@@ -118,8 +131,15 @@ public class ListModelBean {
 			showcaseCategoryList.add("select");
 		}
 
-		if (LIFERAY_FACES_BRIDGE.isDetected() && !LIFERAY_FACES_ALLOY.isDetected() &&
-				!LIFERAY_FACES_METAL.isDetected() && !LIFERAY_FACES_PORTAL.isDetected()) {
+		final Product LIFERAY_FACES_BRIDGE = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_BRIDGE);
+		final boolean LIFERAY_FACES_BRIDGE_DETECTED = LIFERAY_FACES_BRIDGE.isDetected();
+		final Product LIFERAY_FACES_ALLOY = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_ALLOY);
+		final boolean LIFERAY_FACES_ALLOY_DETECTED = LIFERAY_FACES_ALLOY.isDetected();
+		final Product LIFERAY_FACES_CLAY = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_CLAY);
+		final boolean LIFERAY_FACES_CLAY_DETECTED = LIFERAY_FACES_CLAY.isDetected();
+
+		if (LIFERAY_FACES_BRIDGE_DETECTED && !LIFERAY_FACES_ALLOY_DETECTED && !LIFERAY_FACES_CLAY_DETECTED &&
+				!LIFERAY_FACES_PORTAL_DETECTED) {
 			showcaseCategoryList.add("portlet");
 		}
 
@@ -144,7 +164,7 @@ public class ListModelBean {
 		namespaces.add("h");
 		namespaces.add("util");
 
-		if (LIFERAY_FACES_PORTAL.isDetected()) {
+		if (LIFERAY_FACES_PORTAL_DETECTED) {
 
 			if (developmentMode) {
 				namespaces.add("aui");
@@ -154,8 +174,7 @@ public class ListModelBean {
 			namespaces.add("portal");
 		}
 
-		if (LIFERAY_FACES_BRIDGE.isDetected() && !LIFERAY_FACES_ALLOY.isDetected() &&
-				!LIFERAY_FACES_METAL.isDetected()) {
+		if (LIFERAY_FACES_BRIDGE_DETECTED && !LIFERAY_FACES_ALLOY_DETECTED && !LIFERAY_FACES_CLAY_DETECTED) {
 			namespaces.add("portlet");
 		}
 
@@ -184,7 +203,6 @@ public class ListModelBean {
 			else {
 
 				try {
-					ExternalContext startupExternalContext = startupFacesContext.getExternalContext();
 
 					InputStream inputStream = resource.openStream();
 					properties.load(inputStream);
@@ -221,14 +239,14 @@ public class ListModelBean {
 									String sourcePath = File.separator + "resources" + File.separator + "css" +
 										File.separator + sourceFileName;
 
-									sourceFileURL = startupExternalContext.getResource(sourcePath);
+									sourceFileURL = externalContext.getResource(sourcePath);
 								}
 								else if (sourceFileName.endsWith(".js")) {
 
 									String sourcePath = File.separator + "resources" + File.separator + "js" +
 										File.separator + sourceFileName;
 
-									sourceFileURL = startupExternalContext.getResource(sourcePath);
+									sourceFileURL = externalContext.getResource(sourcePath);
 								}
 								else if (sourceFileName.endsWith(".xhtml")) {
 
@@ -240,11 +258,11 @@ public class ListModelBean {
 									}
 
 									sourcePath = sourcePath + sourceFileName;
-									sourceFileURL = startupExternalContext.getResource(sourcePath);
+									sourceFileURL = externalContext.getResource(sourcePath);
 								}
 								else if (sourceFileName.endsWith(".xml")) {
 									String sourcePath = File.separator + "WEB-INF" + File.separator + sourceFileName;
-									sourceFileURL = startupExternalContext.getResource(sourcePath);
+									sourceFileURL = externalContext.getResource(sourcePath);
 								}
 								else if (sourceFileName.endsWith(".properties")) {
 									sourceFileURL = getClass().getClassLoader().getResource(sourceFileName);
@@ -268,7 +286,7 @@ public class ListModelBean {
 
 								if (sourceFileURL != null) {
 
-									startupFacesContext.getApplication().getProjectStage();
+									facesContext.getApplication().getProjectStage();
 
 									CodeExample codeExample = CodeExampleUtil.read(sourceFileURL, sourceFileName,
 											productionMode);
@@ -326,9 +344,10 @@ public class ListModelBean {
 		boolean previousProductDetected = false;
 		StringBuilder buf = new StringBuilder();
 		Product[] products = new Product[] {
-				LIFERAY_FACES_ALLOY, LIFERAY_FACES_BRIDGE, LIFERAY_FACES_METAL, LIFERAY_FACES_PORTAL,
-				ProductFactory.getProduct(Product.Name.LIFERAY_FACES_SHOWCASE),
-				ProductFactory.getProduct(Product.Name.LIFERAY_FACES_UTIL), ProductFactory.getProduct(Product.Name.JSF)
+				LIFERAY_FACES_ALLOY, LIFERAY_FACES_BRIDGE, LIFERAY_FACES_CLAY, LIFERAY_FACES_PORTAL,
+				productFactory.getProductInfo(Product.Name.LIFERAY_FACES_SHOWCASE),
+				productFactory.getProductInfo(Product.Name.LIFERAY_FACES_UTIL),
+				productFactory.getProductInfo(Product.Name.JSF)
 			};
 
 		for (Product product : products) {

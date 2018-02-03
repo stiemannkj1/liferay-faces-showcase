@@ -8,6 +8,12 @@
 			<others />
 		</after>
 	</ordering>
+	<application>
+		<system-event-listener>
+			<system-event-listener-class>com.liferay.faces.showcase.event.PostConstructApplicationConfigEventListener</system-event-listener-class>
+			<system-event-class>com.liferay.faces.util.event.PostConstructApplicationConfigEvent</system-event-class>
+		</system-event-listener>
+	</application>
 	<factory>
 		<factory-extension>
 			<util:i18n-factory>com.liferay.faces.showcase.i18n.internal.I18nFactoryShowcaseImpl</util:i18n-factory>

@@ -17,14 +17,16 @@ package com.liferay.faces.showcase.bean;
 
 import java.io.Serializable;
 
-import javax.faces.application.ProjectStage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 
 import com.liferay.faces.showcase.dto.SelectedComponent;
 import com.liferay.faces.showcase.dto.SelectedComponentImpl;
 import com.liferay.faces.showcase.dto.ShowcaseComponent;
+import com.liferay.faces.util.factory.FactoryExtensionFinder;
 import com.liferay.faces.util.logging.Logger;
 import com.liferay.faces.util.logging.LoggerFactory;
 import com.liferay.faces.util.product.Product;
@@ -41,25 +43,8 @@ public class ShowcaseModelBean implements Serializable {
 	// Logger
 	private static final Logger logger = LoggerFactory.getLogger(ShowcaseModelBean.class);
 
-	// Public Constants
-	public static final boolean BOOTSTRAP_2;
-
-	static {
-
-		final Product LIFERAY_PORTAL = ProductFactory.getProduct(Product.Name.LIFERAY_PORTAL);
-		final Product ALLOY = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_ALLOY);
-		final boolean LIFERAY_PORTAL_6_2_DETECTED = LIFERAY_PORTAL.isDetected() &&
-			((LIFERAY_PORTAL.getMajorVersion() == 6) && (LIFERAY_PORTAL.getMinorVersion() == 2));
-		final boolean ALLOY_2_DETECTED = ALLOY.isDetected() && (ALLOY.getMajorVersion() == 2);
-		BOOTSTRAP_2 = (ALLOY_2_DETECTED || LIFERAY_PORTAL_6_2_DETECTED);
-	}
-
 	// serialVersionUID
 	private static final long serialVersionUID = 3339667513222866249L;
-
-	// Private Constants
-	private static final boolean LIFERAY_FACES_BRIDGE_DETECTED = ProductFactory.getProduct(
-			Product.Name.LIFERAY_FACES_BRIDGE).isDetected();
 
 	// Injections
 	@ManagedProperty(name = "listModelBean", value = "#{listModelBean}")
@@ -71,11 +56,30 @@ public class ShowcaseModelBean implements Serializable {
 	private String sourceControlURL;
 	private ViewParameters viewParameters;
 
+	public static boolean isBootstrap2(FacesContext facesContext) {
+
+		ExternalContext externalContext = facesContext.getExternalContext();
+		ProductFactory productFactory = (ProductFactory) FactoryExtensionFinder.getFactory(externalContext,
+				ProductFactory.class);
+		final Product LIFERAY_PORTAL = productFactory.getProductInfo(Product.Name.LIFERAY_PORTAL);
+		final Product ALLOY = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_ALLOY);
+		final boolean LIFERAY_PORTAL_6_2_DETECTED = LIFERAY_PORTAL.isDetected() &&
+			((LIFERAY_PORTAL.getMajorVersion() == 6) && (LIFERAY_PORTAL.getMinorVersion() == 2));
+		final boolean ALLOY_2_DETECTED = ALLOY.isDetected() && (ALLOY.getMajorVersion() == 2);
+
+		return (ALLOY_2_DETECTED || LIFERAY_PORTAL_6_2_DETECTED);
+	}
+
 	public String getDeploymentType() {
 
 		if (deploymentType == null) {
 
-			if (LIFERAY_FACES_BRIDGE_DETECTED) {
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			final ExternalContext externalContext = facesContext.getExternalContext();
+			final Product LIFERAY_FACES_BRIDGE = ProductFactory.getProductInstance(externalContext,
+					Product.Name.LIFERAY_FACES_BRIDGE);
+
+			if (LIFERAY_FACES_BRIDGE.isDetected()) {
 				deploymentType = "portlet";
 			}
 			else {
@@ -173,7 +177,10 @@ public class ShowcaseModelBean implements Serializable {
 	}
 
 	public boolean isBootstrap2() {
-		return BOOTSTRAP_2;
+
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+
+		return isBootstrap2(facesContext);
 	}
 
 	public void setListModelBean(ListModelBean listModelBean) {

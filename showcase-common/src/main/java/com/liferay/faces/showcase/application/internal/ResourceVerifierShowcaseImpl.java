@@ -18,11 +18,13 @@ package com.liferay.faces.showcase.application.internal;
 import java.io.Serializable;
 
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import com.liferay.faces.util.application.ResourceUtil;
 import com.liferay.faces.util.application.ResourceVerifier;
 import com.liferay.faces.util.application.ResourceVerifierWrapper;
+import com.liferay.faces.util.factory.FactoryExtensionFinder;
 import com.liferay.faces.util.product.Product;
 import com.liferay.faces.util.product.ProductFactory;
 
@@ -36,17 +38,8 @@ public class ResourceVerifierShowcaseImpl extends ResourceVerifierWrapper implem
 	private static final long serialVersionUID = 4691201895912598647L;
 
 	// Private Constants
-	private static final boolean ALLOY_DETECTED = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_ALLOY)
-		.isDetected();
-	private static final Product LIFERAY_PORTAL = ProductFactory.getProduct(Product.Name.LIFERAY_PORTAL);
-	private static final boolean METAL_DETECTED = ProductFactory.getProduct(Product.Name.LIFERAY_FACES_METAL)
-		.isDetected();
-	private static final boolean BOOTSTRAP_SATISFIED = (ALLOY_DETECTED || LIFERAY_PORTAL.isDetected() ||
-			METAL_DETECTED);
 	private static final String BOOTSTRAP_RESOURCE_ID = ResourceUtil.getResourceId("bootstrap",
 			"css/bootstrap.min.css");
-	private static final boolean JQUERY_SATISFIED = (LIFERAY_PORTAL.isDetected() &&
-			(LIFERAY_PORTAL.getMajorVersion() >= 7));
 	private static final String JQUERY_JS_RESOURCE_ID = ResourceUtil.getResourceId("bootstrap", "js/jquery.min.js");
 
 	// Private Members
@@ -56,24 +49,41 @@ public class ResourceVerifierShowcaseImpl extends ResourceVerifierWrapper implem
 		this.wrappedResourceDependencyHandler = resourceVerifier;
 	}
 
+	private static boolean isBootstrapDependencySatisfied(ProductFactory productFactory, final Product LIFERAY_PORTAL) {
+
+		final Product LIFERAY_FACES_ALLOY = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_ALLOY);
+		final Product LIFERAY_FACES_CLAY = productFactory.getProductInfo(Product.Name.LIFERAY_FACES_CLAY);
+
+		return (LIFERAY_FACES_ALLOY.isDetected() || LIFERAY_PORTAL.isDetected() || LIFERAY_FACES_CLAY.isDetected());
+	}
+
+	private static boolean isJQueryDependencySatisfied(final Product LIFERAY_PORTAL) {
+		return (LIFERAY_PORTAL.isDetected() && (LIFERAY_PORTAL.getMajorVersion() >= 7));
+	}
+
 	@Override
 	public ResourceVerifier getWrapped() {
 		return wrappedResourceDependencyHandler;
 	}
 
 	@Override
-	public boolean isDependencySatisfied(FacesContext facestContext, UIComponent componentResource) {
+	public boolean isDependencySatisfied(FacesContext facesContext, UIComponent componentResource) {
 
 		String resourceId = ResourceUtil.getResourceId(componentResource);
+		ExternalContext externalContext = facesContext.getExternalContext();
+		ProductFactory productFactory = (ProductFactory) FactoryExtensionFinder.getFactory(externalContext,
+				ProductFactory.class);
+		final Product LIFERAY_PORTAL = productFactory.getProductInfo(Product.Name.LIFERAY_PORTAL);
 
-		if (BOOTSTRAP_SATISFIED && BOOTSTRAP_RESOURCE_ID.equals(resourceId)) {
+		if (isBootstrapDependencySatisfied(productFactory, LIFERAY_PORTAL) &&
+				BOOTSTRAP_RESOURCE_ID.equals(resourceId)) {
 			return true;
 		}
-		else if (JQUERY_SATISFIED && JQUERY_JS_RESOURCE_ID.equals(resourceId)) {
+		else if (isJQueryDependencySatisfied(LIFERAY_PORTAL) && JQUERY_JS_RESOURCE_ID.equals(resourceId)) {
 			return true;
 		}
 		else {
-			return super.isDependencySatisfied(facestContext, componentResource);
+			return super.isDependencySatisfied(facesContext, componentResource);
 		}
 	}
 }

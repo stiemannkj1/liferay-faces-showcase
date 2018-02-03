@@ -47,7 +47,7 @@ public class RowRenderer extends RowRendererBase {
 		Row row = (Row) uiComponent;
 		String rowStyleClass = "row";
 
-		if (ShowcaseModelBean.BOOTSTRAP_2) {
+		if (ShowcaseModelBean.isBootstrap2(facesContext)) {
 			rowStyleClass = rowStyleClass.concat("-fluid");
 		}
 
