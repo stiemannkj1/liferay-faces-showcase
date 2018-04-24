@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2018 Liferay, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 import com.liferay.faces.showcase.dto.Country;
-import com.liferay.faces.showcase.service.CountryService;
 
 
 /**
@@ -35,9 +32,6 @@ import com.liferay.faces.showcase.service.CountryService;
  */
 @FacesConverter(value = "com.liferay.faces.showcase.converter.CountryGmapConverter")
 public class CountryGmapConverter implements Converter {
-
-	// Static field must be declared volatile in order for the double-check idiom to work (requires JRE 1.5+)
-	private static volatile Map<Long, Country> countryMap;
 
 	@Override
 	public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String value) {
@@ -49,8 +43,8 @@ public class CountryGmapConverter implements Converter {
 	@Override
 	public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object value) {
 
-		Country country = getCountryMap(facesContext).get(value);
-
+		Map<Long, Country> countryMap = OnDemandCountryMap.INSTANCE.get(facesContext);
+		Country country = countryMap.get((Long) value);
 		String URL = "https://www.google.com/maps/place/";
 
 		try {
@@ -61,31 +55,5 @@ public class CountryGmapConverter implements Converter {
 
 			return null;
 		}
-	}
-
-	protected Map<Long, Country> getCountryMap(FacesContext facesContext) {
-
-		Map<Long, Country> countryMap = CountryGmapConverter.countryMap;
-
-		// First check without locking (not yet thread-safe)
-		if (countryMap == null) {
-
-			synchronized (CountryGmapConverter.class) {
-
-				countryMap = CountryGmapConverter.countryMap;
-
-				// Second check with locking (thread-safe)
-				if (countryMap == null) {
-
-					ELResolver elResolver = facesContext.getApplication().getELResolver();
-					ELContext elContext = facesContext.getELContext();
-					CountryService countryService = (CountryService) elResolver.getValue(elContext, null,
-							"countryService");
-					countryMap = CountryGmapConverter.countryMap = countryService.getCountryMap();
-				}
-			}
-		}
-
-		return countryMap;
 	}
 }

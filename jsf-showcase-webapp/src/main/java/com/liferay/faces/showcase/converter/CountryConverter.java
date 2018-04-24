@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2017 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2018 Liferay, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,12 @@ package com.liferay.faces.showcase.converter;
 
 import java.util.Map;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 import com.liferay.faces.showcase.dto.Country;
-import com.liferay.faces.showcase.service.CountryService;
 
 
 /**
@@ -35,17 +32,14 @@ import com.liferay.faces.showcase.service.CountryService;
 @FacesConverter(value = "com.liferay.faces.showcase.converter.CountryConverter")
 public class CountryConverter implements Converter {
 
-	// Static field must be declared volatile in order for the double-check idiom to work (requires JRE 1.5+)
-	private static volatile Map<Long, Country> countryMap;
-
 	@Override
 	public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String value) {
 		Object countryObject = null;
 
 		if ((value != null) && !"".equals(value)) {
 			Long countryId = Long.parseLong(value);
-
-			countryObject = getCountryMap(facesContext).get(countryId);
+			Map<Long, Country> countryMap = OnDemandCountryMap.INSTANCE.get(facesContext);
+			countryObject = countryMap.get(countryId);
 		}
 
 		return countryObject;
@@ -61,31 +55,5 @@ public class CountryConverter implements Converter {
 		}
 
 		return strValue;
-	}
-
-	protected Map<Long, Country> getCountryMap(FacesContext facesContext) {
-
-		Map<Long, Country> countryMap = CountryConverter.countryMap;
-
-		// First check without locking (not yet thread-safe)
-		if (countryMap == null) {
-
-			synchronized (CountryConverter.class) {
-
-				countryMap = CountryConverter.countryMap;
-
-				// Second check with locking (thread-safe)
-				if (countryMap == null) {
-
-					ELResolver elResolver = facesContext.getApplication().getELResolver();
-					ELContext elContext = facesContext.getELContext();
-					CountryService countryService = (CountryService) elResolver.getValue(elContext, null,
-							"countryService");
-					countryMap = CountryConverter.countryMap = countryService.getCountryMap();
-				}
-			}
-		}
-
-		return countryMap;
 	}
 }
