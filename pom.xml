@@ -91,8 +91,10 @@
 		<faces.version>${mojarra.version}</faces.version>
 		<full.version>${project.version} (${timestamp} AD)</full.version>
 		<log4j.version>1.2.14</log4j.version>
+		<manifest.mf></manifest.mf>
 		<mojarra.version>2.2.18</mojarra.version>
 		<myfaces.version>UNSUPPORTED</myfaces.version>
+		<prettyfaces.version>3.3.3</prettyfaces.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<surefire.version>2.12</surefire.version>
@@ -169,7 +171,9 @@
 					<artifactId>maven-war-plugin</artifactId>
 					<version>2.3</version>
 					<configuration>
+						<useDefaultManifestFile>true</useDefaultManifestFile>
 						<archive>
+							<manifestFile>${manifest.mf}</manifestFile>
 							<manifestEntries>
 								<Built-By>Release Manager</Built-By>
 								<Implementation-Title>${project.name}</Implementation-Title>
@@ -181,6 +185,7 @@
 						<dependentWarExcludes>WEB-INF/lib/*</dependentWarExcludes>
 						<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 						<warName>${war.name}</warName>
+						<packagingExcludes>**/web-thin-wab.xml</packagingExcludes>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -421,7 +426,7 @@
 			<dependency>
 				<groupId>com.ocpsoft</groupId>
 				<artifactId>prettyfaces-jsf2</artifactId>
-				<version>3.3.3</version>
+				<version>${prettyfaces.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

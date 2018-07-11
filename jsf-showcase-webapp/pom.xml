@@ -13,6 +13,11 @@
 	<name>JSF Showcase Webapp</name>
 	<description>This plugin is the JSF Showcase demo webapp.</description>
 
+	<properties>
+		<asm.version>7.0</asm.version>
+		<war.dependency.scope>compile</war.dependency.scope>
+	</properties>
+
 	<profiles>
 		<profile>
 			<id>jdkNotSupportedBySelenium</id>
@@ -26,6 +31,258 @@
 		<profile>
 			<id>prettyfaces</id>
 			<dependencies>
+				<dependency>
+					<groupId>com.ocpsoft</groupId>
+					<artifactId>prettyfaces-jsf2</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>thinWab</id>
+			<properties>
+				<faces.servlet.container.initializer>com.liferay.faces.util.osgi.FacesThinWabInitializer</faces.servlet.container.initializer>
+				<jetty.version>9.4.8.v20171121</jetty.version>
+				<manifest.mf>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifest.mf>
+				<maven.war.webxml>${basedir}/src/main/webapp/WEB-INF/web-thin-wab.xml</maven.war.webxml>
+				<mojarra.war.dependency.scope>provided</mojarra.war.dependency.scope>
+				<war.dependency.scope>provided</war.dependency.scope>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>biz.aQute.bnd</groupId>
+						<artifactId>bnd-maven-plugin</artifactId>
+						<version>3.5.0</version>
+						<configuration>
+							<bnd>
+								<![CDATA[
+									-includeresource: \
+										WEB-INF/lib/com.liferay.faces.demo.showcase.common-${project.version}.jar=\
+											com.liferay.faces.demo.showcase.common-${project.version}.jar;lib:=true,\
+										WEB-INF/lib/prettyfaces-jsf2-${prettyfaces.version}.jar=\
+											prettyfaces-jsf2-${prettyfaces.version}.jar;lib:=true
+									# PrettyFaces optionally relies on certain Apache packages.
+									# com.sun.el must be imported for Mojarra to work correctly.
+									Import-Package: \
+										!com.liferay.faces.showcase.*,\
+										!com.ocpsoft.shade.*,\
+										org.apache.avalon.*;resolution:=optional,\
+										org.apache.commons.*;resolution:=optional,\
+										org.apache.log.*;resolution:=optional,\
+										org.apache.log4j.*;resolution:=optional,\
+										com.sun.el,\
+										javax.annotation;version="[1.2.0,2.0.0)",\
+										javax.el;version="[2.2.0,4.0.0)",\
+										javax.faces.view;version="[2.2,3)",\
+										javax.faces.webapp;version="[2.2,3)",\
+										com.liferay.faces.util.osgi;version="[1.0.0,2.0.0)",\
+										com.liferay.faces.util.lifecycle;version="[1.0.0,2.0.0)",\
+										com.liferay.faces.util.event;version="[1.0.0,2.0.0)",\
+										*
+									# Including dot (".") is necessary to ensure that the bnd-maven-plugin adds imports
+									# from this war's classes. The -includeresource instruction includes
+									# showcase-common and PrettyFaces so there is no need to include them here.
+									Bundle-ClassPath: .,WEB-INF/classes
+									Web-ContextPath: /${project.artifactId}
+								]]>
+							</bnd>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>bnd-process</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<mkdir dir="${project.build.outputDirectory}/META-INF/services" />
+										<echo message="${faces.servlet.container.initializer}"
+											  file="${project.build.outputDirectory}/META-INF/services/javax.servlet.ServletContainerInitializer" />
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>delete-duplicate-files</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<delete dir="${project.build.outputDirectory}/WEB-INF" />
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-util</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-http</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-io</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-security</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-server</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-servlet</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-webapp</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-deploy</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-xml</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty.osgi</groupId>
+					<artifactId>jetty-osgi-boot</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm-analysis</artifactId>
+					<version>${asm.version}</version>
+					<scope>compile</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm-tree</artifactId>
+					<version>${asm.version}</version>
+					<scope>compile</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm-util</artifactId>
+					<version>${asm.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm-commons</artifactId>
+					<version>${asm.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.ow2.asm</groupId>
+					<artifactId>asm</artifactId>
+					<version>${asm.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.aries</groupId>
+					<artifactId>org.apache.aries.util</artifactId>
+					<version>1.1.3</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.aries.spifly</groupId>
+					<artifactId>org.apache.aries.spifly.dynamic.bundle</artifactId>
+					<version>1.2.1</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-jndi</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.geronimo.specs</groupId>
+					<artifactId>geronimo-jta_1.1_spec</artifactId>
+					<version>1.1.1</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-plus</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-annotations</artifactId>
+					<version>${jetty.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>javax.servlet.jsp.jstl</groupId>
+					<artifactId>javax.servlet.jsp.jstl-api</artifactId>
+					<version>1.2.1</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.glassfish.web</groupId>
+					<artifactId>el-impl</artifactId>
+					<version>2.2</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>com.liferay.faces</groupId>
+					<artifactId>com.liferay.faces.osgi.weaver</artifactId>
+					<version>1.0.0-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.glassfish</groupId>
+					<artifactId>javax.faces</artifactId>
+					<version>${mojarra.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>com.liferay.faces</groupId>
+					<artifactId>com.liferay.faces.util</artifactId>
+					<scope>provided</scope>
+				</dependency>
 				<dependency>
 					<groupId>com.ocpsoft</groupId>
 					<artifactId>prettyfaces-jsf2</artifactId>
@@ -242,15 +499,18 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<!-- END: Only required for file upload -->
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.el</groupId>
@@ -274,18 +534,22 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.web</groupId>
 			<artifactId>jstl-impl</artifactId>
+			<scope>${war.dependency.scope}</scope>
 		</dependency>
 	</dependencies>
 
